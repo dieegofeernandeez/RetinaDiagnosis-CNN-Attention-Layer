@@ -42,10 +42,3 @@ def create_tf_dataset(df, batch_size=32):
 train_dataset = create_tf_dataset(train_df)
 val_dataset = create_tf_dataset(val_df)
 
-
-
-
-for image, label in train_dataset.take(5):  # Muestra 5 imágenes del dataset
-    print(f"Imagen Tensor: {image.shape} → Etiqueta: {label.numpy()}")
-
-
