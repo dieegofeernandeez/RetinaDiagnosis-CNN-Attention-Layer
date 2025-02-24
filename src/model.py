@@ -7,7 +7,7 @@ from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.applications.resnet50 import preprocess_input
 
 
-# Definimos el modelo preentrenado que vamos utilizar en este caso ResNet50
+# Definir el modelo preentrenado que se va utilizar en este caso ResNet50
 model_base = tf.keras.applications.ResNet50(
         include_top=False,  #  No incluir la capa de clasificación final 
         weights='imagenet',  #  Usar pesos preentrenados en ImageNet
@@ -15,7 +15,7 @@ model_base = tf.keras.applications.ResNet50(
         pooling="avg"
 )
 
-model_base.trainable = False #congelos las capas para que  no se entrenen y evitar perder el conocimiento
+model_base.trainable = False #congelar las capas para que  no se entrenen y evitar perder el conocimiento
 
 
 # Añadir las capas de clasificación para nuestro problema
@@ -40,4 +40,3 @@ model.compile(
 
 model.save("/mnt/c/Users/Usuario/Documents/DiagnosticoRetina/models/resnet50_aptos.h5")
 
-print("✅ Modelo ResNet50 creado y guardado correctamente.")
