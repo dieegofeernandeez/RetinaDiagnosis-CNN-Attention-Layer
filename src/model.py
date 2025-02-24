@@ -1,42 +1,47 @@
 import tensorflow as tf
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense, Flatten, Dropout, BatchNormalization, GlobalAveragePooling2D
-from tensorflow.keras.applications import ResNet50, EfficientNetB0
+from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.losses import SparseCategoricalCrossentropy
 from tensorflow.keras.applications.resnet50 import preprocess_input
+from tensorflow.keras.regularizers import l2
 
 
-# Definir el modelo preentrenado que se va utilizar en este caso ResNet50
+# Definir el modelo preentrenado ResNet50
 model_base = tf.keras.applications.ResNet50(
-        include_top=False,  #  No incluir la capa de clasificación final 
-        weights='imagenet',  #  Usar pesos preentrenados en ImageNet
-        input_shape=(224, 224, 3),  # Tamaño de entrada de las imagenes 
+        include_top=False,  
+        weights='imagenet',  
+        input_shape=(224, 224, 3),  
         pooling="avg"
 )
 
-model_base.trainable = False #congelar las capas para que  no se entrenen y evitar perder el conocimiento
+# Inicialmente, congelamos todas las capas del modelo base
+model_base.trainable = False 
 
-
-# Añadir las capas de clasificación para nuestro problema
+# Construir la parte personalizada de la red
 x = model_base.output 
-x = Dense(128, activation = 'relu')(x)
-x = Dropout(0.3)(x)
-x = Dense(64, activation = 'relu')(x)
-x = Dropout(0.3)(x)
-outputs = Dense(5, activation = 'softmax')(x)
+x = Dense(128, activation='relu', kernel_regularizer=l2(0.001))(x)  # 🔹 Agregamos regularización L2
+x = BatchNormalization()(x)
+x = Dropout(0.5)(x)
 
+x = Dense(64, activation='relu', kernel_regularizer=l2(0.001))(x)  # 🔹 Regularización en la capa de 64 neuronas
+x = BatchNormalization()(x)
+x = Dropout(0.4)(x)
 
-# Modelo final para conectar la RestNet50 con nuestras capas densas
+outputs = Dense(5, activation='softmax')(x)
+
+# Modelo final
 model = tf.keras.models.Model(inputs=model_base.input, outputs=outputs)
 
-
-#Compilamos
+# Compilar el modelo
 model.compile(
-    optimizer = tf.keras.optimizers.Adam(learning_rate = 0.0001),
-    loss = tf.keras.losses.SparseCategoricalCrossentropy(),
+    optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+    loss=tf.keras.losses.SparseCategoricalCrossentropy(label_smoothing=0.1),  # 🔹 Usamos label smoothing
     metrics=['accuracy']
 )
 
+# Guardar modelo inicial
 model.save("/mnt/c/Users/Usuario/Documents/DiagnosticoRetina/models/resnet50_aptos.h5")
+
 
