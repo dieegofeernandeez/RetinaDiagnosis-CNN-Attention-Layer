@@ -48,18 +48,24 @@ def load_and_preprocess_image(img_path, label, augment=False):
 # 🔹 Función para crear datasets en formato TensorFlow
 def create_tf_dataset(df, batch_size=32, augment=False):
     image_paths = df['image_path'].values
-    labels = df['diagnosis'].values.astype(np.int32) 
-    
+    labels = df['diagnosis'].values.astype(np.int32)  # 🔴 Asegurar etiquetas en int32
+
     dataset = tf.data.Dataset.from_tensor_slices((image_paths, labels))
-    dataset = dataset.map(lambda x, y: tf.py_function(
-        func=load_and_preprocess_image, 
-        inp=[x, y, augment], 
-        Tout=(tf.float32, tf.int32)
-    ), num_parallel_calls=tf.data.AUTOTUNE)
-    
+
+    def load_and_preprocess_with_label(img_path, label):
+        img, label = tf.py_function(func=load_and_preprocess_image, 
+                                    inp=[img_path, label, augment], 
+                                    Tout=(tf.float32, tf.int32))
+        
+        img.set_shape((224, 224, 3))  # 🔴 Asegurar que la imagen tenga shape correcta
+        label.set_shape(())  # 🔴 Evitar que label sea `NoneType`
+        return img, label
+
+    dataset = dataset.map(load_and_preprocess_with_label, num_parallel_calls=tf.data.AUTOTUNE)
     dataset = dataset.batch(batch_size).prefetch(tf.data.AUTOTUNE)
-    
+
     return dataset
+
 
 # Crear datasets de entrenamiento y validación
 train_dataset = create_tf_dataset(train_df, batch_size=BATCH_SIZE, augment=True)
