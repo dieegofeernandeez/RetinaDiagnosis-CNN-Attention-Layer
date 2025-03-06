@@ -9,17 +9,21 @@ from sklearn.utils.class_weight import compute_class_weight
 import numpy as np
 import pandas as pd
 from tensorflow.keras.callbacks import ReduceLROnPlateau
-
+from customlayers import rescale_gap
 
 # Importar el modelo cargado 
-model=tf.keras.models.load_model('/mnt/c/Users/Usuario/Documents/DiagnosticoRetina/models/resnet50_aptos.h5')
 
-# Definir los hiperparámetros
+model = tf.keras.models.load_model(
+    '/content/drive/MyDrive/DiagnosticoRetina/models/resnet50_aptos.keras',
+    custom_objects={'Custom>rescale_gap': rescale_gap}
+)
+
+
 
 num_epochs=25
 
 checkpoint_cb = ModelCheckpoint(
-    "/mnt/c/Users/Usuario/Documents/DiagnosticoRetina/models/resnet50_aptos_best.h5",  # 📌 Ruta donde guardamos el modelo
+    "/mnt/c/Users/Usuario/Documents/DiagnosticoRetina/models/resnet50_aptos_best.keras",  # 📌 Ruta donde guardamos el modelo
     save_best_only=True,  # ✅ Solo guarda el mejor modelo (según val_loss)
     monitor="val_loss",  # 🔍 Monitorea la pérdida en validación
     mode="min",  # 🔽 Queremos que val_loss sea lo más baja posible
@@ -43,17 +47,13 @@ lr_scheduler = ReduceLROnPlateau(
 )
 
 
-
-LABELS_FILE = "/mnt/c/Users/Usuario/Documents/DiagnosticoRetina/data/APTOS2019/train.csv"  # Ruta al CSV
+LABELS_FILE = "/content/drive/MyDrive/DiagnosticoRetina/data/APTOS2019/train.csv"
 
 # Cargar etiquetas
 df = pd.read_csv(LABELS_FILE)
-train_labels = df["diagnosis"].values  # Extraer las etiquetas
+train_labels = df["diagnosis"].values  #
 
-# Calcular los pesos de clase
 class_weights = compute_class_weight("balanced", classes=np.unique(train_labels), y=train_labels)
-
-# Convertir los pesos a diccionario
 class_weights_dict = {i: weight for i, weight in enumerate(class_weights)}
 
 # Entrenar el modelo
@@ -61,8 +61,8 @@ history = model.fit(
     train_dataset,  
     validation_data=val_dataset,  
     epochs=num_epochs,  
-    class_weight=class_weights_dict,  # 🔴 **Aquí aplicamos los pesos de clase**
-    callbacks=[checkpoint_cb, early_stopping_cb, lr_scheduler],  # Callbacks para guardar el mejor modelo y detener entrenamiento temprano
-    verbose=1  # Muestra el progreso en la consola
+    class_weight=class_weights_dict,  
+    callbacks=[checkpoint_cb, early_stopping_cb, lr_scheduler], 
+    verbose=1 
 )
  

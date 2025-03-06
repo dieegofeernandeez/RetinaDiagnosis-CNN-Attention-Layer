@@ -7,6 +7,7 @@ from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.optimizers import Adam
 
+from customlayers import rescale_gap
 
 
 # Función para crear el modelo
@@ -14,7 +15,6 @@ from tensorflow.keras.optimizers import Adam
 def create_model(input_shape, num_classes):
     
     in_lay = Input(input_shape)
-
     base_model = ResNet50(input_shape=input_shape, include_top=False, weights='imagenet')
     for layer in base_model.layers[-10:]:
         layer.trainable = True
@@ -30,18 +30,23 @@ def create_model(input_shape, num_classes):
     #Expandimos la máscara para igualar la profundidad de ResNet50
     pt_depth = base_model.output_shape[-1]
     up_c2_w = np.ones((1, 1, 1, pt_depth))
-    up_c2 = Conv2D(pt_depth, kernel_size=(1,1), padding='same', activation='linear', use_bias=False, weights=[up_c2_w])
+    up_c2 = Conv2D(
+        pt_depth,
+        kernel_size=(1,1),
+        padding='same',
+        activation='linear',
+        use_bias=False
+    )
+    _ = up_c2(tf.zeros((1, 7, 7, 1)))
+    up_c2.set_weights([up_c2_w])
     up_c2.trainable = False
     attn_layer = up_c2(attn_layer)
-
     mask_features = Multiply()([attn_layer, bn_features])
-
-    # 🔹 **Aplicamos GlobalAveragePooling2D y reescalamos**
+    
     gap_features = GlobalAveragePooling2D()(mask_features)
     gap_mask = GlobalAveragePooling2D()(attn_layer)
-    gap = Lambda(lambda x: x[0] / x[1], name='RescaleGAP')([gap_features, gap_mask])
+    gap = Lambda(rescale_gap, name='RescaleGAP')([gap_features, gap_mask])
 
-    # 🔹 **Dropout y Capa de Clasificación**
     gap_dr = Dropout(0.5)(gap)
     out_layer = Dense(num_classes, activation='softmax')(gap_dr)
 
@@ -53,13 +58,12 @@ def create_model(input_shape, num_classes):
     metrics=['accuracy']
     )
 
-
     return model
 
 
-attention_model = create_model((224, 224, 3), 5)  # 5 clases
+attention_model = create_model((224, 224, 3), 5)  
 attention_model.summary()
-attention_model.save("/mnt/c/Users/Usuario/Documents/DiagnosticoRetina/models/resnet50_aptos.h5")
+attention_model.save("/content/drive/MyDrive/DiagnosticoRetina/models/resnet50_aptos.keras")
 
 
 
