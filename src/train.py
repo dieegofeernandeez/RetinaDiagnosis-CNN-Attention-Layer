@@ -23,7 +23,7 @@ model = tf.keras.models.load_model(
 num_epochs=25
 
 checkpoint_cb = ModelCheckpoint(
-    "/mnt/c/Users/Usuario/Documents/DiagnosticoRetina/models/resnet50_aptos_best.keras",  # 📌 Ruta donde guardamos el modelo
+    "/content/drive/MyDrive/DiagnosticoRetina/models/resnet50_aptos.keras",  # 📌 Ruta donde guardamos el modelo
     save_best_only=True,  # ✅ Solo guarda el mejor modelo (según val_loss)
     monitor="val_loss",  # 🔍 Monitorea la pérdida en validación
     mode="min",  # 🔽 Queremos que val_loss sea lo más baja posible
@@ -41,7 +41,7 @@ early_stopping_cb = EarlyStopping(
 
 lr_scheduler = ReduceLROnPlateau(
     monitor="val_loss",
-    factor=0.5,  # Reduce el LR a la mitad si no mejora
+    factor=0.7,  
     patience=2,  # Espera 2 epochs sin mejora antes de reducir
     verbose=1
 )
