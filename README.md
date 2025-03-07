@@ -1,1 +1,1 @@
-# Diagnóstico de Retinopatía con CNN + Transformer
+# Diagnóstico de Retinopatía con CNN + Capa de atención
