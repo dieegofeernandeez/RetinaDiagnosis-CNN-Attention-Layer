@@ -55,7 +55,7 @@ Para entrenar el modelo:
 python train.py
 ```
 
-El modelo se guarda automáticamente en models/ y se monitoriza usando:
+El modelo se guarda automáticamente en `models/` y se monitoriza usando:
 
 - ModelCheckpoint
 
@@ -64,6 +64,10 @@ El modelo se guarda automáticamente en models/ y se monitoriza usando:
 - ReduceLROnPlateau
 
 ### Notas finales
+
+El mejor resultado obtenido durante el entrenamiento ha sido el siguente:
+
+ - Epoch 10: accuracy: 0.8800 - loss: 0.5990 - val_accuracy: 0.7520 - val_loss: 0.9270
 
 
 

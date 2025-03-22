@@ -24,19 +24,19 @@ num_epochs=25
 
 checkpoint_cb = ModelCheckpoint(
     "/content/drive/MyDrive/DiagnosticoRetina/models/resnet50_aptos.keras",  # 📌 Ruta donde guardamos el modelo
-    save_best_only=True,  # ✅ Solo guarda el mejor modelo (según val_loss)
-    monitor="val_loss",  # 🔍 Monitorea la pérdida en validación
-    mode="min",  # 🔽 Queremos que val_loss sea lo más baja posible
-    verbose=1  # 📝 Muestra información en la consola
+    save_best_only=True,  
+    monitor="val_loss",  
+    mode="min",  
+    verbose=1  
 )
 
 
 early_stopping_cb = EarlyStopping(
-    patience=3,  # 📌 Si no mejora en 3 epochs, se detiene el entrenamiento
-    restore_best_weights=True,  # ✅ Restaura los pesos del mejor modelo antes de la caída
-    monitor="val_loss",  # 🔍 Monitorea la pérdida en validación
-    mode="min",  # 🔽 Queremos que val_loss sea lo más baja posible
-    verbose=1  # 📝 Muestra información en la consola
+    patience=3,  # Si no mejora en 3 epochs, se detiene el entrenamiento
+    restore_best_weights=True,  
+    monitor="val_loss",  
+    mode="min", 
+    verbose=1 
 )
 
 lr_scheduler = ReduceLROnPlateau(
@@ -65,4 +65,3 @@ history = model.fit(
     callbacks=[checkpoint_cb, early_stopping_cb, lr_scheduler], 
     verbose=1 
 )
- 

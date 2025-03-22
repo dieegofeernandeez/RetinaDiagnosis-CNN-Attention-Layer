@@ -21,11 +21,12 @@ def create_model(input_shape, num_classes):
     
     pt_features = base_model(in_lay)
     bn_features = BatchNormalization()(pt_features)
-
+    
     attn_layer = Conv2D(128, kernel_size=(3,3), padding='same', activation='relu', kernel_regularizer=l2(0.0005))(Dropout(0.6)(bn_features))
     attn_layer = Conv2D(64, kernel_size=(3,3), padding='same', activation='relu', kernel_regularizer=l2(0.0005))(attn_layer)
     attn_layer = Conv2D(32, kernel_size=(3,3), padding='same', activation='relu', kernel_regularizer=l2(0.0005))(attn_layer)
     attn_layer = Conv2D(1, kernel_size=(1,1), padding='valid', activation='sigmoid')(attn_layer)  # **Genera la máscara de atención**
+
 
     #Expandimos la máscara para igualar la profundidad de ResNet50
     pt_depth = base_model.output_shape[-1]
