@@ -22,15 +22,17 @@ Desarrollar un modelo capaz de clasificar imágenes de retina en las 5 clases an
 ### Requisitos
 
 Instala las dependencias desde `requirements.txt`:
-'bash'
+
+```bash
 pip install -r requirements.txt
+```
 
 
 ### Preprocesamiento
 
 Las imágenes se cargan, redimensionan y normalizan. Se aplican aumentos de datos condicionales (solo a clases 2, 3 y 4).
 
-Esto se maneja en src/preprocess.py.
+Esto se maneja en `src/preprocess.py.`
 
 ### Arquitectura
 
@@ -42,15 +44,16 @@ Esto se maneja en src/preprocess.py.
 
 - Capa densa final con softmax
 
-Definido en src/model.py.
+Definido en `src/model.py.`
 
 
 ### Entrenamiento
 
 Para entrenar el modelo:
 
-'bash'
+```bash
 python train.py
+```
 
 El modelo se guarda automáticamente en models/ y se monitoriza usando:
 
