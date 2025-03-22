@@ -1,4 +1,5 @@
-data
+data/
 src/__pycache__
 models/notas.txt
-src/prueba.py
+*.keras
+*.h5
